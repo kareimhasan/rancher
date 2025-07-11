@@ -1,0 +1,26 @@
+name: Deploy to Minikube
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set kubectl context
+      run: |
+        kubectl config use-context minikube
+
+    - name: Deploy nginx
+      run: |
+        kubectl create deployment test-nginx --image=nginx --dry-run=client -o yaml > deployment.yaml
+        kubectl apply -f deployment.yaml
+
+    - name: Check pods
+      run: kubectl get pods
